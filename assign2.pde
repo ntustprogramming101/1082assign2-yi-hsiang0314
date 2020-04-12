@@ -25,6 +25,7 @@ int robotY;
 int laserW;
 int laserX;
 int gameState;
+int lifePoint;
 
 
 boolean downPressed = false;
@@ -33,6 +34,7 @@ boolean rightPressed = false;
 
 final int GAME_START=0, GAME_RUN=1, GAME_LOSE=2;
 final int GROUNDHOG_WIDTH=80;
+final int SOLDIER_WIDTH=80;
 
 void setup() {
   size(640, 480, P2D);
@@ -59,6 +61,7 @@ void setup() {
 
   //soldier start position 
   soldierY=floor(random(2, 6))*80;
+
   ////robot start postion
   //robotX=floor(random(2, 8))*80;
   //robotY=floor(random(2, 6))*80;
@@ -70,10 +73,13 @@ void setup() {
   //}
   //laserW=10;
   //laserX=robotX+25;
+
+  //groundhog start position
   groundhogX = 320;
   groundhogY = 80;
   groundhogMove = 80;
-  
+  //life
+  lifePoint=2;
 }
 
 void draw() {
@@ -100,7 +106,6 @@ void draw() {
     //bg
     image(background, 0, 0);
 
-
     noStroke();
     //grass
     rectMode(CORNER);  
@@ -119,29 +124,41 @@ void draw() {
     //  strokeWeight(2);
     //  line(i*80, 160, i*80, height);
     //} 
+
     //groundhog
     image(groundhog, groundhogX, groundhogY);
 
     //groundhog move
 
- 
     if (downPressed) {
-    
-      
     }
     if (leftPressed) {
-      
     }
     if (rightPressed) {
-      
     }
-    
+
+    //groundhog killed by soldier
+    if ((groundhogX<soldierX+SOLDIER_WIDTH && groundhogX+GROUNDHOG_WIDTH>soldierX)&&
+    (groundhogY<soldierY+SOLDIER_WIDTH && groundhogY+GROUNDHOG_WIDTH>soldierY)) {
+      groundhogX=320;
+      groundhogY=80;
+      lifePoint-=1;
+      if (lifePoint<=0) {
+        gameState= GAME_LOSE;
+      }
+    }
+
 
 
     //life
-    image(life, 10, 10);
-    image(life, 80, 10);
-    image(life, 150, 10);
+
+    for (int i = 0; i<lifePoint; i+=1) {
+      image(life, 10+i*70, 10);
+    }
+    //image(life, 10, 10);
+    //image(life, 80, 10);
+    //image(life, 150, 10);
+
     //soldier
     image(soldier, soldierX, soldierY);
     soldierX+=2;
@@ -164,12 +181,25 @@ void draw() {
     //  laserW=0;
     //  laserX=robotX+25;
     //}
-   // }
- break; 
-  // Game Lose
-  //case GAME_LOSE:
-  //break;
-}
+    // }
+    break; 
+
+    // Game Lose
+  case GAME_LOSE:
+    image(gameover, 0, 0);
+    image(restartNormal, 248, 360);
+    //button back to game
+    if ((mouseX>=248 && mouseX<=392) && (mouseY>=360 && mouseY<=420)) {
+      if (mousePressed) {
+        //click
+        gameState= GAME_RUN;
+      } else {
+        //hover
+        image(restartHovered, 248, 360);
+      }
+    }
+    break;
+  }
 }
 
 void keyPressed() {
@@ -178,18 +208,22 @@ void keyPressed() {
 
     case DOWN :
       downPressed=true;
-      groundhogY+=groundhogMove;    
+      if (groundhogY<height-GROUNDHOG_WIDTH) {
+        groundhogY+=groundhogMove;
+      }  
       break;
     case LEFT :
       leftPressed=true;
-      groundhogX-=groundhogMove;
+      if (groundhogX>0) {
+        groundhogX-=groundhogMove;
+      }
       break;
     case RIGHT :
       rightPressed=true;
-      if(groundhogX<width-GROUNDHOG_WIDTH){
+      if (groundhogX<width-GROUNDHOG_WIDTH) {
         groundhogX+=groundhogMove;
       }
-      
+
       break;
     }
   }
