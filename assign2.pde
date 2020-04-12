@@ -26,6 +26,8 @@ int laserW;
 int laserX;
 int gameState;
 int lifePoint;
+int cabbageX;
+int cabbageY;
 
 
 boolean downPressed = false;
@@ -35,10 +37,12 @@ boolean rightPressed = false;
 final int GAME_START=0, GAME_RUN=1, GAME_LOSE=2;
 final int GROUNDHOG_WIDTH=80;
 final int SOLDIER_WIDTH=80;
+final int CABBAGE_WIDTH=80;
 
 void setup() {
   size(640, 480, P2D);
   // Enter Your Setup Code Here
+  frameRate(60);
   gameState = GAME_START ;
   background = loadImage("img/bg.jpg");
   groundhog = loadImage("img/groundhogIdle.png");
@@ -58,6 +62,9 @@ void setup() {
   restartHovered = loadImage("img/restartHovered.png");
 
 
+  //cabbage show up position 
+  cabbageY=floor(random(2, 6))*CABBAGE_WIDTH;
+  cabbageX=floor(random(1, 8))*CABBAGE_WIDTH;
 
   //soldier start position 
   soldierY=floor(random(2, 6))*80;
@@ -78,6 +85,7 @@ void setup() {
   groundhogX = 320;
   groundhogY = 80;
   groundhogMove = 80;
+
   //life
   lifePoint=2;
 }
@@ -106,6 +114,7 @@ void draw() {
     //bg
     image(background, 0, 0);
 
+
     noStroke();
     //grass
     rectMode(CORNER);  
@@ -124,13 +133,13 @@ void draw() {
     //  strokeWeight(2);
     //  line(i*80, 160, i*80, height);
     //} 
-
     //groundhog
     image(groundhog, groundhogX, groundhogY);
 
     //groundhog move
 
     if (downPressed) {
+
     }
     if (leftPressed) {
     }
@@ -139,7 +148,7 @@ void draw() {
 
     //groundhog killed by soldier
     if ((groundhogX<soldierX+SOLDIER_WIDTH && groundhogX+GROUNDHOG_WIDTH>soldierX)&&
-    (groundhogY<soldierY+SOLDIER_WIDTH && groundhogY+GROUNDHOG_WIDTH>soldierY)) {
+      (groundhogY<soldierY+SOLDIER_WIDTH && groundhogY+GROUNDHOG_WIDTH>soldierY)) {
       groundhogX=320;
       groundhogY=80;
       lifePoint-=1;
@@ -147,15 +156,20 @@ void draw() {
         gameState= GAME_LOSE;
       }
     }
+    //eat cabbage and get one life
+    if ((groundhogX<cabbageX+CABBAGE_WIDTH && groundhogX+GROUNDHOG_WIDTH>cabbageX)&&
+      (groundhogY<cabbageY+CABBAGE_WIDTH && groundhogY+GROUNDHOG_WIDTH>cabbageY)) {
+      cabbageX=-160;
+      lifePoint+=1;
+    }
 
 
 
     //life
 
-    for (int i = 0; i<lifePoint; i+=1) {
+    for (int i =0; i<lifePoint; i+=1) {
       image(life, 10+i*70, 10);
     }
-    //image(life, 10, 10);
     //image(life, 80, 10);
     //image(life, 150, 10);
 
@@ -165,6 +179,10 @@ void draw() {
     if (soldierX>640) {
       soldierX=-80;
     }
+    //cabbage
+    image(cabbage, cabbageX, cabbageY);
+
+
     ////robot
     //image(robot, robotX, robotY);
     ////laser
@@ -193,6 +211,12 @@ void draw() {
       if (mousePressed) {
         //click
         gameState= GAME_RUN;
+        lifePoint=2;
+        //cabbage show up position 
+        cabbageY=floor(random(2, 6))*CABBAGE_WIDTH;
+        cabbageX=floor(random(1, 8))*CABBAGE_WIDTH;
+        //soldier start position 
+        soldierY=floor(random(2, 6))*80;
       } else {
         //hover
         image(restartHovered, 248, 360);
@@ -209,7 +233,7 @@ void keyPressed() {
     case DOWN :
       downPressed=true;
       if (groundhogY<height-GROUNDHOG_WIDTH) {
-        groundhogY+=groundhogMove;
+       
       }  
       break;
     case LEFT :
